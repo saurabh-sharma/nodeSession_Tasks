@@ -1,7 +1,7 @@
 const args = require('yargs').argv;
 const os = require('os');
 const fs = require('fs');
-const debug = true;
+const debug = false;
 const fileName = 'library.json';
 if (debug) {
     console.log("========FOR DEBUGGING========");
@@ -36,7 +36,7 @@ console.log(read); */
 const checkFile = fs.existsSync(fileName);
 
 let add = args.add || false, del = args.del || false, viewAll = args.viewAll || false, viewSpecific = args.viewSpecific || false
-console.log(add, del, viewAll, viewSpecific);
+debug?console.log(add, del, viewAll, viewSpecific):'';
 
 //CHECKING IF OPERATION PROVIDED
 if (!(add || del || viewAll || viewSpecific)) {
@@ -56,6 +56,7 @@ else {
     //Trying to read from file
     const fileObj = JSON.parse(fs.readFileSync(fileName, { encoding: 'utf-8' }));
     //console.log(fileObj);
+    console.log("\n\n---------------------------------------------");
     if (add) {
         if (fileObj) {
             let bookName = args.bookName; let bookCode = args.bookCode; let bookPrice = args.bookPrice; let bookAuthor = args.bookAuthor;
@@ -148,6 +149,7 @@ else {
         console.log("Showing all books in inventory:");
         console.log(fileObj);
     }
+    console.log("---------------------------------------------\n\n");
 }
 
 
