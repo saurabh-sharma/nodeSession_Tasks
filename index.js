@@ -9,30 +9,6 @@ if (debug) {
     console.log("=============================");
 }
 
-// const read = fs.readFileSync('node_testfile.txt', {encoding:'utf-8'});
-// fs.mkdirSync('abc/');
-// fs.writeFileSync('abc/node_testfile.txt', "Node File write sync demo");
-// console.log(read);
-
-/* fs.writeFileSync('OS.json', JSON.stringify(os));
-const read = fs.readFileSync('OS.json', {encoding:'utf-8'});
-console.log(read); */
-
-/* fs.stat('library.json', function (err, fileStat) {
-    if (err) {
-        if (err.code == 'ENOENT') {
-            console.log('Does not exist.');
-        }
-    }
-    else {
-        if (fileStat.isFile()) {
-            console.log('File found.');
-        }
-    }
-});
- */
-
-
 const checkFile = fs.existsSync(fileName);
 
 let add = args.add || false, del = args.del || false, viewAll = args.viewAll || false, viewSpecific = args.viewSpecific || false
