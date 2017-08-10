@@ -2,6 +2,7 @@ const args = require('yargs').argv;
 const os = require('os');
 const fs = require('fs');
 const debug = true;
+const fileName = 'library.json';
 if (debug) {
     console.log("========FOR DEBUGGING========");
     console.log("Arguments: ", args);
@@ -32,10 +33,10 @@ console.log(read); */
  */
 
 
-const checkFile = fs.existsSync('library.json');
+const checkFile = fs.existsSync(fileName);
 
 let add = args.add || false, del = args.del || false, viewAll = args.viewAll || false, viewSpecific = args.viewSpecific || false
-console.log(add,del,viewAll,viewSpecific);
+console.log(add, del, viewAll, viewSpecific);
 
 //CHECKING IF OPERATION PROVIDED
 if (!(add || del || viewAll || viewSpecific)) {
@@ -43,17 +44,17 @@ if (!(add || del || viewAll || viewSpecific)) {
 }
 else {
     if (checkFile) {
-        console.log("File Found -- Skipping File creation operations");
+        debug ? console.log("File Found -- Skipping File creation operations") : '';
     }
     else {
-        console.log("File Not Found -- Creating File");
-        fs.writeFileSync('library.json', '[]')
+        debug ? console.log("File Not Found -- Creating File") : '';
+        fs.writeFileSync(fileName, '[]')
     }
 
     // Perform Tasks
 
     //Trying to read from file
-    const fileObj = JSON.parse(fs.readFileSync('library.json', { encoding: 'utf-8' }));
+    const fileObj = JSON.parse(fs.readFileSync(fileName, { encoding: 'utf-8' }));
     //console.log(fileObj);
     if (add) {
         if (fileObj) {
@@ -68,34 +69,85 @@ else {
                 }
             }
             else {
-                const tempObj = {};
-                tempObj.bookName = bookName;
-                tempObj.bookCode = bookCode;
-                tempObj.bookPrice = bookPrice;
-                tempObj.bookAuthor = bookAuthor;
-                //Add obj to file obj here
-                fileObj.push(tempObj);
-                fs.writeFileSync('library.json', JSON.stringify(fileObj));
-                console.log(fileObj);
+                let existingBook = false;
+                //Search for existing book Code
+                fileObj.forEach(function (element) {
+                    if (element.bookCode == bookCode) {
+                        console.log(`A book with book code "${bookCode}" already exists\nHere are the details:`);
+                        console.log(element);
+                        existingBook = true;
+                        return false;
+                    }
+                }, this);
+                if (!existingBook) {
+                    const tempObj = {};
+                    tempObj.bookName = bookName;
+                    tempObj.bookCode = bookCode;
+                    tempObj.bookPrice = bookPrice;
+                    tempObj.bookAuthor = bookAuthor;
+                    //Add obj to file obj here
+                    fileObj.push(tempObj);
+                    fs.writeFileSync(fileName, JSON.stringify(fileObj));
+                    //console.log(fileObj);
+                    debug ? '' : console.clear();
+                    console.log("Book Saved");
+                }
             }
         }
     }
     if (del) {
         if (fileObj) {
             let bookCode = args.bookCode;
-            //Search Book and delete
+            if (!bookCode) {
+                console.error("Required fields are missing. Please provide the following:\n----------------------------------------------------------");
+                if (!bookCode) {
+                    console.error("--bookCode");
+                }
+            }
+            else {
+                let index = fileObj.findIndex((element) => {
+                    return element.bookCode === bookCode;
+                })
+                if (index !== -1) {
+                    fileObj.splice(index, 1)
+                    fs.writeFileSync(fileName, JSON.stringify(fileObj));
+                    console.log(`Book with code "${bookCode}" deleted from inventory`);
+                }
+                else {
+                    console.log(`No record found for "${bookCode}"`);
+                }
+
+            }
+
         }
     }
     if (viewSpecific) {
         if (fileObj) {
             let bookCode = args.bookCode;
+            if (!bookCode) {
+                console.error("Required fields are missing. Please provide the following:\n----------------------------------------------------------");
+                console.error("--bookCode");
+            }
+            else {
+                let existingBook = false;
+                fileObj.forEach(function (element) {
+                    if (element.bookCode == bookCode) {
+                        existingBook = true;
+                        console.log("Book Found! Here are the details:");
+                        console.log(element);
+                        return false;
+                    }
+                }, this);
+                if (!existingBook) { console.log(`Book with code "${bookCode}" not found in inventory`); }
+            }
+
             //Search Book and view
         }
     }
     if (viewAll) {
+        console.log("Showing all books in inventory:");
         console.log(fileObj);
     }
-
 }
 
 
